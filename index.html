@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Todo App</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            font-family: "Inter", sans-serif;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+        }
+
+        input[type="checkbox"] {
+            position: relative;
+            width: 1.2em;
+            height: 1.2em;
+            border: 1px solid black;
+            border-radius: 4px;
+            /* Adjusts the position of the checkboxes on the text baseline */
+            vertical-align: -2px;
+            /* Set here so that Windows' High-Contrast Mode can override */
+            color: black;
+        }
+
+        input[type="checkbox"]::before {
+            content: "✔";
+            position: absolute;
+            font-size: 1.2em;
+            right: -1px;
+            top: -0.3em;
+            visibility: hidden;
+        }
+
+        input[type="checkbox"]:checked::before {
+            /* Use `visibility` instead of `display` to avoid recalculating layout */
+            visibility: visible;
+        }
+
+        input[type="checkbox"]:disabled {
+            border-color: black;
+            background: #ddd;
+            color: gray;
+        }
+
+        .container {
+            /* border: 1px solid black; */
+            width: 50%;
+            height: 100vh;
+            padding: 16px;
+
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                h1 {
+                    font-size: 24px;
+                    font-weight: 600;
+                }
+
+                p {
+                    margin-top: 8px;
+                }
+
+                .container__header__time {
+                    h1 {
+                        font-size: 36px;
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
+
+        .todo__create__container {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            input {
+                display: block;
+                width: 80%;
+                font-size: 20px;
+                padding: 8px;
+                outline: none;
+                border-radius: 8px;
+            }
+
+            button {
+                display: block;
+                width: 15%;
+                padding: 10px;
+                font-size: 20px;
+                border-radius: 8px;
+                background-color: #0ea5e9;
+                color: #fff;
+                outline: none;
+                border: none;
+            }
+        }
+
+        .todo__container {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px 0;
+        }
+
+        .todo__item {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 8px;
+            background: #fff;
+            align-items: center;
+            border: 2px solid #0ea5e9;
+
+            .todo__item__left {
+                display: flex;
+                align-items: center;
+                column-gap: 16px;
+
+                span {
+                    font-size: 20px;
+                }
+            }
+
+            .todo__delete__button {
+                cursor: pointer;
+            }
+        }
+
+        .todo__item--completed {
+            text-decoration: line-through;
+        }
+
+        .container {
+            background-color: white;
+            height: 10cm;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <header class="container__header">
+            <div>
+                <h1 id="greeting">Good Evening, Sithija 👋</h1>
+                <p id="date">Today, Sat 1st October 2024</p>
+            </div>
+            <div class="container__header__time">
+                <h1 id="time">9:05 PM</h1>
+            </div>
+        </header>
+        <div class="todo__create__container">
+            <input type="text" class="todo__input" placeholder="What needs to be done?" />
+            <button class="todo__create__button">Add</button>
+        </div>
+        <div class="todo__container"></div>
+    </main>
+    <script>
+        const todoCreateButton = document.querySelector(".todo__create__button");
+        const todoInput = document.querySelector(".todo__input");
+        const todoContainer = document.querySelector(".todo__container");
+        const deletebtn = document.querySelector(".todo__delete__button");
+        
+        let date = new Date();
+        let day = date.getDate(); // Day of the month (1-31)
+        let month = date.toLocaleString('default', { month: 'long' }); // Full month name (e.g., December)
+        let year = date.getFullYear();
+        let  hours = date.getHours();
+        let minutes = date.getMinutes();
+        let greet  = document.querySelector("#greeting")
+        
+        // Display Date 
+         document.getElementById("date").innerHTML = `Today, ${day} ${month} ${year}`;
+         document.getElementById("time").innerHTML = `${hours}:${minutes} PM`;
+
+         const upadatetime =()=>{
+            let date = new Date();
+            let  hours = date.getHours();
+            if(hours<12){
+                greet.innerHTML = "Good Morning, Sithija 👋";
+            } else if(hours >=12 || hours <18){
+                greet.innerHTML = "Good Afternoon, Sithija👋";
+            }else if(hours>=18){
+                greet.innerHTML = "Good Evening, Sithija👋";
+
+            }
+         }
+         upadatetime();
+
+
+        const Todovalues = []
+        let todoelements = []
+        
+
+
+
+        todoCreateButton.addEventListener("click", () => {
+            const todoValue = todoInput.value;
+            if (todoValue === "") {
+                return;
+            }
+            Todovalues.push(todoValue);
+            todoInput.value = "";
+            console.log(todoValue);
+
+
+           const todoelements = Todovalues.map((val) => {
+    return `<div class="todo__item">
+        <div class="todo__item__left">
+          <input type="checkbox" id="completed" name="completed" />
+          <span>${val}</span>
+        </div>
+        <div class="todo__item__right">
+          <svg
+            class="todo__delete__button"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="red"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-trash"
+          >
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+          </svg>
+        </div>
+      </div>`;
+
+
+
+            })
+           console.log(todoelements.join(" "));
+            todoContainer.innerHTML = todoelements.join(" ");
+        });
+
+        todoContainer.addEventListener("click", (e) => {
+    if (e.target.closest(".todo__delete__button")) {
+        // Find the parent todo item
+        const todoItem = e.target.closest(".todo__item");
+        // Get the index of the todo item
+        const index = Array.from(todoContainer.children).indexOf(todoItem);
+        // Remove the item from the Todovalues array
+        Todovalues.splice(index, 1);
+        // Re-render the todo list
+        renderTodos();
+    }
+});
+
+// Render todos function to dynamically display todo items
+function renderTodos() {
+    todoContainer.innerHTML = Todovalues.map((val, index) => {
+        // val     index
+        // go gym   1 -:   example
+        return ""
+    }).join("");
+}
+
+        
+    </script>
+</body>
+
+</html>
